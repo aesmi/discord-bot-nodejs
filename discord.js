@@ -6,11 +6,11 @@ const musicModule = require('./modules/musicModule.js');
 const server = require('http').createServer(app);
 
 app.get("/", (request, response) => {
-  console.log(Date.now() + " Ping Received");
-  response.sendStatus(200);
+	console.log(Date.now() + " Ping Received");
+	response.sendStatus(200);
 });
-const listener = server.listen(process.env.PORT, function() {
-  console.log('Your app is listening on port ' + listener.address().port);
+const listener = server.listen(process.env.PORT, function () {
+	console.log('Your app is listening on port ' + listener.address().port);
 });
 
 require('dotenv').config();
@@ -40,22 +40,31 @@ client.on('message', message => {
 
 //commands
 client.on('message', message => {
-	const command=message.content.toLowerCase();
+	//I should really use a switch lmao
+	const command = message.content.toLowerCase();
+	if (!message.content.startsWith(prefix) || message.author.bot) return;
 	//ping : pings bot
-	if (command === (config.prefix + 'ping')){
+	if (command === (config.prefix + 'ping')) {
 		message.channel.send('Hullo');
 	}
 	//avatar : gets avatar
 	if (message.content.startsWith(config.prefix + 'avatar')) {
-        //grabs user by message mention or message author
+		//grabs user by message mention or message author
 		const user = message.mentions.users.first() || message.author;
+		//new Discord.RichEmbed object
 		const avatarEmbed = new Discord.RichEmbed()
-            .setColor(0x333333)
-            //access various user object properties
+			.setColor(0x333333)
+			//access various user object properties
 			.setAuthor(user.username)
-            .setImage(user.avatarURL);
-        //send embedded object
+			.setImage(user.avatarURL);
+		//send embedded object
 		message.channel.send(avatarEmbed);
 	}
+	//kick: kick user
+	if(command === "kick") {
+		let member = message.mentions.members.first();
+		let reason = args.slice(1).join(" ");
+		member.kick(reason);
+	  }
 
 });
